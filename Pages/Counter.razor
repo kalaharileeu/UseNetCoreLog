@@ -1,0 +1,117 @@
+﻿@page "/counter"
+@*using UseNetCoreLog.Data
+    @inject LogyhogService LogService*@
+
+@if (TU == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <p>@TU.ToString()</p>
+}
+<h1>Can load datasets and check Pass/Fail</h1>
+
+<p>Current count: @currentCount</p>
+<p>Pass/Fail: @value</p>
+
+<p>@count</p>
+@if (theError != null)
+{
+    <p>@theError.ErrorString</p>
+    <p>@theError.ErrorInt</p>
+    <p>@theError.httpStatus</p>
+    <p>@theError.name</p>
+    <p>@theError.loggingtype</p>
+}
+<br/>
+<p>
+    @foreach (Rectangle rect in rectPassFail)
+    {
+        if (rect.DatasetID == 0)
+        {
+            <button class="bt btn-success">@rect.X @rect.Y</button>
+        }
+        if (rect.DatasetID == -1)
+        {
+            <button class="bt btn-warning">@rect.X @rect.Y</button>
+        }
+        if (rect.DatasetID == -2)
+        {
+            <button class="bt btn-danger">@rect.X @rect.Y</button>
+        }
+    }
+</p>
+<br/>
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+
+<button class="btn btn-danger" @onclick="Getresult">Test</button>
+
+
+
+@code {
+    private int currentCount = 0;
+    private int count = 0;
+    private int value = -1000;
+    private TaskUser TU;
+    private string datasetname = "44";
+    private ErrorFeedback theError = null;
+
+    private List<Rectangle> rectPassFail = new List<Rectangle>();
+
+
+
+    private void IncrementCount()
+    {
+        currentCount++;
+    }
+
+    private void LoadLimits()
+    {
+        TU.Setlimits(datasetname, 5, 5, 3, 3);
+    }
+
+    private async Task<TaskUser> GetDatasets()
+    {
+        var t = new TaskUser("https://api.logyhog.com/api/", "GJW8SL", "blazortest", $"blazor{RandomString(6)}");
+        t.Setlimits(datasetname, 5, 5, 3, 3);
+        await Task.Delay(1);
+        return t;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        TU = await GetDatasets();
+    }
+
+    private void Getresult()
+    {
+        int x = new Random().Next(0, 7);
+        int y = new Random().Next(0, 7);
+        var response = TU.XY(datasetname, x, y);
+        theError = TU.GetError(datasetname);
+        //-1 is a error
+        if (response == null)
+        {
+            value = -66;
+            return;
+        }
+        if (response is Rectangle)
+        {
+            rectPassFail.Add(response);
+        }
+        value = -66;
+    }
+
+    public static string RandomString(int length)
+    {
+        var chars = "78UVWXYZ01234ABCDNOPQRSGHIJKLM569TEF";
+        var stringChars = new char[length];
+        var random = new Random();
+
+        for (int i = 0; i < stringChars.Length; i++)
+            stringChars[i] = chars[random.Next(chars.Length)];
+
+        return new String(stringChars);
+    }
+}
