@@ -11,7 +11,18 @@ else
     <p>@TU.ToString()</p>
 }
 <h1>Can load datasets and check Pass/Fail</h1>
-
+<br />
+<button class="btn btn-primary" @onclick="IncrementCount">Check this page</button>
+<button class="btn btn-danger" @onclick="Getresult">Test</button>
+<br />
+@if (e == null)
+{
+    <p>Exception: No Exception</p>
+}
+else
+{
+    <p>Exception: @e.Message</p>
+}
 <p>Current count: @currentCount</p>
 <p>Pass/Fail: @value</p>
 
@@ -24,7 +35,7 @@ else
     <p>@theError.name</p>
     <p>@theError.loggingtype</p>
 }
-<br/>
+<br />
 <p>
     @foreach (Rectangle rect in rectPassFail)
     {
@@ -42,12 +53,7 @@ else
         }
     }
 </p>
-<br/>
-<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
-
-<button class="btn btn-danger" @onclick="Getresult">Test</button>
-
-
+<br />
 
 @code {
     private int currentCount = 0;
@@ -56,10 +62,9 @@ else
     private TaskUser TU;
     private string datasetname = "44";
     private ErrorFeedback theError = null;
+    private Exception e;
 
     private List<Rectangle> rectPassFail = new List<Rectangle>();
-
-
 
     private void IncrementCount()
     {
@@ -73,15 +78,22 @@ else
 
     private async Task<TaskUser> GetDatasets()
     {
-        var t = new TaskUser("https://api.logyhog.com/api/", "GJW8SL", "blazortest", $"blazor{RandomString(6)}");
-        t.Setlimits(datasetname, 5, 5, 3, 3);
+        var atask = new TaskUser("https://api.logyhog.com/api/", "J9ZDPC", "blazortest", $"blazor{RandomString(6)}");
+        atask.Setlimits(datasetname, 5, 5, 3, 3);
         await Task.Delay(1);
-        return t;
+        return atask;
     }
 
     protected override async Task OnInitializedAsync()
     {
-        TU = await GetDatasets();
+        try
+        {
+            TU = await GetDatasets();
+        }
+        catch (Exception e)
+        {
+            this.e = e;
+        }
     }
 
     private void Getresult()

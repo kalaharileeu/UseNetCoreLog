@@ -1,0 +1,91 @@
+﻿@page "/CanLogY"
+
+<h1>CanLogY</h1>
+<br />
+<button class="btn btn-primary" @onclick="IncrementCount">Check this page</button>
+<button class="btn btn-danger" @onclick="Getresult">Test</button>
+<br />
+@if (TU == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <p>@TU.ToString()</p>
+}
+<p>Current count: @currentCount</p>
+<p>Pass/Fail: @value</p>
+@if (e == null)
+{
+    <p>Exception: No Exception</p>
+}
+else
+{
+    <p>Exception: @e.Message</p>
+}
+
+@if (theError != null)
+{
+    <p>@theError.ErrorString</p>
+    <p>@theError.ErrorInt</p>
+    <p>@theError.httpStatus</p>
+    <p>@theError.name</p>
+    <p>@theError.loggingtype</p>
+}
+
+@code {
+    private int currentCount = 0;
+    private TaskUser TU;
+    private string datasetname = "testtext";
+    private ErrorFeedback theError = null;
+    private List<Exception> eList;
+
+    private async Task<TaskUser> GetDatasets()
+    {
+        var t = new TaskUser("https://api.logyhog.com/api/", "J9ZDPC", "blazortest", $"blazor{RandomString(6)}");
+        t.Setlimits(datasetname, 5, 5, 3, 3);
+        await Task.Delay(1);
+        return t;
+    }
+
+    private void IncrementCount()
+    {
+        currentCount++;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            TU = await GetDatasets();
+        }
+        catch (Exception e)
+        {
+            eList.Add(e);
+        }
+    }
+
+    private void Getresult()
+    {
+        try
+        {
+            var response = TU.Y(datasetname, new Random().Next(-100, 100));
+        }
+        catch (Exception e)
+        {
+            eList.Add(e);
+        }
+    }
+
+    public static string RandomString(int length)
+    {
+        var chars = "78UVWXYZ01234ABCDNOPQRSGHIJKLM569TEF";
+        var stringChars = new char[length];
+        var random = new Random();
+
+        for (int i = 0; i < stringChars.Length; i++)
+            stringChars[i] = chars[random.Next(chars.Length)];
+
+        return new String(stringChars);
+    }
+}
