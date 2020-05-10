@@ -2,9 +2,6 @@
 
 <h1>CanLogY</h1>
 <br />
-<button class="btn btn-primary" @onclick="IncrementCount">Check this page</button>
-<button class="btn btn-danger" @onclick="Getresult">Test</button>
-<br />
 @if (TU == null)
 {
     <p><em>Loading...</em></p>
@@ -13,32 +10,51 @@ else
 {
     <p>@TU.ToString()</p>
 }
-<p>Current count: @currentCount</p>
-<p>Pass/Fail: @value</p>
-@if (e == null)
+<br />
+<hr>
+<button class="btn btn-primary" @onclick="IncrementCount">
+    Test this page
+    <span class="badge badge-light">@currentCount</span>
+</button>
+<button class="btn btn-danger" @onclick="Getresult">Test</button>
+<br />
+<hr>
+<h3>Logging feedback</h3>
+<p>
+    @foreach (PointDatevsY point in responseList)
+    {
+        <button class="badge">@point.Y</button>
+    }
+</p>
+<br />
+<hr>
+<h3>Http response other that 200</h3>
+@if (httpResposneList != null)
 {
-    <p>Exception: No Exception</p>
+    foreach (var hr in httpResposneList)
+    {
+        <button class="badge badge-pill badge-info">@hr</button>
+    }
 }
-else
+<br />
+<hr>
+<h3>Exception</h3>
+<br />
+@if (exList != null)
 {
-    <p>Exception: @e.Message</p>
-}
-
-@if (theError != null)
-{
-    <p>@theError.ErrorString</p>
-    <p>@theError.ErrorInt</p>
-    <p>@theError.httpStatus</p>
-    <p>@theError.name</p>
-    <p>@theError.loggingtype</p>
+    foreach (var ex in exList)
+    {
+        <p>@ex.Message ....</p>
+    }
 }
 
 @code {
     private int currentCount = 0;
     private TaskUser TU;
     private string datasetname = "testtext";
-    private ErrorFeedback theError = null;
-    private List<Exception> eList;
+    private List<Exception> exList = new List<Exception>();
+    private List<PointDatevsY> responseList = new List<PointDatevsY>();
+    private List<int> httpResposneList = new List<int>();
 
     private async Task<TaskUser> GetDatasets()
     {
@@ -61,7 +77,7 @@ else
         }
         catch (Exception e)
         {
-            eList.Add(e);
+            exList.Add(e);
         }
     }
 
@@ -70,10 +86,15 @@ else
         try
         {
             var response = TU.Y(datasetname, new Random().Next(-100, 100));
+            if (response is PointDatevsY)
+                responseList.Add(response);
+            var getHttpresponse = TU.GetError(datasetname);
+            if (getHttpresponse.ErrorInt < 0 || getHttpresponse.statuscode != 200)
+                httpResposneList.Add(getHttpresponse.statuscode);
         }
         catch (Exception e)
         {
-            eList.Add(e);
+            exList.Add(e);
         }
     }
 

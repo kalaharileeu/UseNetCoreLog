@@ -1,7 +1,8 @@
 ﻿@page "/counter"
 @*using UseNetCoreLog.Data
     @inject LogyhogService LogService*@
-
+<h1>Can load datasets and check Pass/Fail</h1>
+<br />
 @if (TU == null)
 {
     <p><em>Loading...</em></p>
@@ -10,9 +11,12 @@ else
 {
     <p>@TU.ToString()</p>
 }
-<h1>Can load datasets and check Pass/Fail</h1>
 <br />
-<button class="btn btn-primary" @onclick="IncrementCount">Check this page</button>
+<hr>
+<button class="btn btn-primary" @onclick="IncrementCount">
+    Test this page
+    <span class="badge badge-light">@currentCount</span>
+</button>
 <button class="btn btn-danger" @onclick="Getresult">Test</button>
 <br />
 @if (e == null)
@@ -23,7 +27,6 @@ else
 {
     <p>Exception: @e.Message</p>
 }
-<p>Current count: @currentCount</p>
 <p>Pass/Fail: @value</p>
 
 <p>@count</p>
