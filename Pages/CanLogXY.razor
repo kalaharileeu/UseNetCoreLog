@@ -1,4 +1,4 @@
-﻿@page "/counter"
+﻿@page "/canlogxy"
 @*using UseNetCoreLog.Data
     @inject LogyhogService LogService*@
 <h1>Can load datasets and check Pass/Fail</h1>
@@ -19,6 +19,28 @@ else
 </button>
 <button class="btn btn-danger" @onclick="Getresult">Test</button>
 <br />
+<hr />
+<h3>Logging feedback </h3>
+<p>Different colors for pass rates with rect limits</p>
+<p>
+    @foreach (Rectangle rect in responseList)
+    {
+        if (rect.DatasetID == 0)
+        {
+            <badge class="bt btn-success">@rect.X @rect.Y</badge>
+        }
+        if (rect.DatasetID == -1)
+        {
+            <badge class="bt btn-warning">@rect.X @rect.Y</badge>
+        }
+        if (rect.DatasetID == -2)
+        {
+            <badge class="bt btn-danger">@rect.X @rect.Y</badge>
+        }
+    }
+</p>
+<br />
+<hr>
 @if (e == null)
 {
     <p>Exception: No Exception</p>
@@ -39,23 +61,7 @@ else
     <p>@theError.loggingtype</p>
 }
 <br />
-<p>
-    @foreach (Rectangle rect in rectPassFail)
-    {
-        if (rect.DatasetID == 0)
-        {
-            <button class="bt btn-success">@rect.X @rect.Y</button>
-        }
-        if (rect.DatasetID == -1)
-        {
-            <button class="bt btn-warning">@rect.X @rect.Y</button>
-        }
-        if (rect.DatasetID == -2)
-        {
-            <button class="bt btn-danger">@rect.X @rect.Y</button>
-        }
-    }
-</p>
+
 <br />
 
 @code {
@@ -65,19 +71,8 @@ else
     private TaskUser TU;
     private string datasetname = "44";
     private ErrorFeedback theError = null;
-    private Exception e;
-
-    private List<Rectangle> rectPassFail = new List<Rectangle>();
-
-    private void IncrementCount()
-    {
-        currentCount++;
-    }
-
-    private void LoadLimits()
-    {
-        TU.Setlimits(datasetname, 5, 5, 3, 3);
-    }
+    private List<Exception> exList = new List<Exception>();
+    private List<Rectangle> responseList = new List<Rectangle>();
 
     private async Task<TaskUser> GetDatasets()
     {
@@ -85,6 +80,16 @@ else
         atask.Setlimits(datasetname, 5, 5, 3, 3);
         await Task.Delay(1);
         return atask;
+    }
+
+    private void LoadLimits()
+    {
+        TU.Setlimits(datasetname, 5, 5, 3, 3);
+    }
+
+    private void IncrementCount()
+    {
+        currentCount++;
     }
 
     protected override async Task OnInitializedAsync()
@@ -95,7 +100,7 @@ else
         }
         catch (Exception e)
         {
-            this.e = e;
+            exList.Add(e);
         }
     }
 
@@ -113,7 +118,7 @@ else
         }
         if (response is Rectangle)
         {
-            rectPassFail.Add(response);
+            responseList.Add(response);
         }
         value = -66;
     }
