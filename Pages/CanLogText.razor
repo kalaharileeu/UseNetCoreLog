@@ -1,6 +1,6 @@
-﻿@page "/CanLogY"
+﻿@page "/CanLogText"
 
-<h1>CanLogY</h1>
+<h1>CanLogText</h1>
 <br />
 @if (TU == null)
 {
@@ -19,7 +19,8 @@ else
 <button class="btn btn-danger" @onclick="Getresult">Test</button>
 <br />
 <hr>
-<h3>Logging feedback</h3>
+<h3>Logging feedback </h3>
+<p>The value below is the Y color value returned from the API</p>
 <p>
     @foreach (PointDatevsY point in responseList)
     {
@@ -51,7 +52,7 @@ else
 @code {
     private int currentCount = 0;
     private TaskUser TU;
-    private string datasetname = "testY";
+    private string datasetname = "testtext";
     private List<Exception> exList = new List<Exception>();
     private List<PointDatevsY> responseList = new List<PointDatevsY>();
     private List<int> httpResposneList = new List<int>();
@@ -84,8 +85,8 @@ else
     {
         try
         {
-            var response = TU.Y(datasetname, new Random().Next(-100, 100));
-            if (response is PointDatevsY)
+            var response = TU.Text(datasetname, RandomString(50), new Random().Next(0, 5));
+            if (response is Text)
                 responseList.Add(response);
             var getHttpresponse = TU.GetError(datasetname);
             if (getHttpresponse.ErrorInt < 0 || getHttpresponse.statuscode != 200)
