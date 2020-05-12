@@ -23,6 +23,7 @@ else
     <span class="badge badge-light">@currentCount</span>
 </button>
 <button class="btn btn-danger" @onclick="Getresult">Test</button>
+<button class="btn btn-danger" @onclick="LoadTestTask">Load Test Tesk</button>
 <br />
 <hr>
 <h3>Logging feedback </h3>
@@ -85,6 +86,18 @@ else
     private void IncrementCount()
     {
         currentCount++;
+    }
+
+    private async Task LoadTestTask()
+    {
+        try
+        {
+            TU = await GetDatasets();
+        }
+        catch (Exception e)
+        {
+            exList.Add(e);
+        }
     }
 
     protected override async Task OnInitializedAsync()
