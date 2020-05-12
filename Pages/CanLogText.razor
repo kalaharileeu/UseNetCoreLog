@@ -11,8 +11,14 @@ else
     <p>@TU.ToString()</p>
 }
 <br />
+<p>
+    <button class="badge badge-pill badge-info">Tasktoken: @inputToken </button>
+    <button class="badge badge-pill badge-info"> TaskName: @inputdatasetname </button>
+</p>
+<input type="text" placeholder="TaskToken" name="TaskToken" @oninput="(EventArgs) => {SetInputToken(EventArgs.Value.ToString());}" />
+<input type="text" placeholder="TaskName" name="TaskName" @oninput="(EventArgs) => {SetTaskName(EventArgs.Value.ToString());}" />
 <hr>
-<button class="btn btn-primary" @onclick="IncrementCount">
+<button class=" btn btn-primary" @onclick="IncrementCount">
     Test this page
     <span class="badge badge-light">@currentCount</span>
 </button>
@@ -45,11 +51,13 @@ else
 {
     foreach (var ex in exList)
     {
-        <p>@ex.Message ....</p>
+        <p>@ex.Message</p>
     }
 }
 
 @code {
+    private string inputdatasetname = "";
+    private string inputToken = "";
     private int currentCount = 0;
     private TaskUser TU;
     private string datasetname = "testtext";
@@ -57,9 +65,19 @@ else
     private List<PointDatevsY> responseList = new List<PointDatevsY>();
     private List<int> httpResposneList = new List<int>();
 
+    private void SetInputToken(string s)
+    {
+        inputToken = s;
+    }
+
+    private void SetTaskName(string s)
+    {
+        inputdatasetname = s;
+    }
+
     private async Task<TaskUser> GetDatasets()
     {
-        var t = new TaskUser("https://api.logyhog.com/api/", "J9ZDPC", "blazortest", $"blazor{RandomString(6)}");
+        var t = new TaskUser("https://api.logyhog.com/api/", inputToken, inputdatasetname, $"blazor{RandomString(6)}");
         await Task.Delay(1);
         return t;
     }

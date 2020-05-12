@@ -41,36 +41,33 @@ else
 </p>
 <br />
 <hr>
-@if (e == null)
+<h3>Http response other that 200</h3>
+@if (httpResposneList != null)
 {
-    <p>Exception: No Exception</p>
-}
-else
-{
-    <p>Exception: @e.Message</p>
-}
-<p>Pass/Fail: @value</p>
-
-<p>@count</p>
-@if (theError != null)
-{
-    <p>@theError.ErrorString</p>
-    <p>@theError.ErrorInt</p>
-    <p>@theError.httpStatus</p>
-    <p>@theError.name</p>
-    <p>@theError.loggingtype</p>
+    foreach (var hr in httpResposneList)
+    {
+        <button class="badge badge-pill badge-info">@hr</button>
+    }
 }
 <br />
-
+<hr>
+<h3>Exception</h3>
+<br />
+@if (exList != null)
+{
+    foreach (var ex in exList)
+    {
+        <p>@ex.Message</p>
+    }
+}
 <br />
 
 @code {
     private int currentCount = 0;
     private int count = 0;
-    private int value = -1000;
     private TaskUser TU;
     private string datasetname = "44";
-    private ErrorFeedback theError = null;
+    private List<int> httpResposneList = new List<int>();
     private List<Exception> exList = new List<Exception>();
     private List<Rectangle> responseList = new List<Rectangle>();
 
@@ -106,21 +103,23 @@ else
 
     private void Getresult()
     {
-        int x = new Random().Next(0, 7);
-        int y = new Random().Next(0, 7);
-        var response = TU.XY(datasetname, x, y);
-        theError = TU.GetError(datasetname);
-        //-1 is a error
-        if (response == null)
+        try
         {
-            value = -66;
-            return;
+            int x = new Random().Next(0, 7);
+            int y = new Random().Next(0, 7);
+            var response = TU.XY(datasetname, x, y);
+            if (response is Rectangle)
+            {
+                responseList.Add(response);
+            }
+            var getHttpresponse = TU.GetError(datasetname);
+            if (getHttpresponse.ErrorInt < 0 || getHttpresponse.statuscode != 200)
+                httpResposneList.Add(getHttpresponse.statuscode);
         }
-        if (response is Rectangle)
+        catch (Exception e)
         {
-            responseList.Add(response);
+            exList.Add(e);
         }
-        value = -66;
     }
 
     public static string RandomString(int length)
