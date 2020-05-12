@@ -12,12 +12,19 @@ else
     <p>@TU.ToString()</p>
 }
 <br />
+<p>
+    <button class="badge badge-pill badge-info">Tasktoken: @inputToken </button>
+    <button class="badge badge-pill badge-info"> TaskName: @inputdatasetname </button>
+</p>
+<input type="text" placeholder="TaskToken" name="TaskToken" @oninput="(EventArgs) => {SetInputToken(EventArgs.Value.ToString());}" />
+<input type="text" placeholder="TaskName" name="TaskName" @oninput="(EventArgs) => {SetTaskName(EventArgs.Value.ToString());}" />
 <hr>
 <button class="btn btn-primary" @onclick="IncrementCount">
     Test this page
     <span class="badge badge-light">@currentCount</span>
 </button>
 <button class="btn btn-danger" @onclick="Getresult">Test</button>
+<button class="btn btn-warning" @onclick="LoadTestTask">Load Test Tesk</button>
 <br />
 <hr />
 <h3>Logging feedback </h3>
@@ -63,6 +70,8 @@ else
 <br />
 
 @code {
+    private string inputdatasetname = "";
+    private string inputToken = "";
     private int currentCount = 0;
     private int count = 0;
     private TaskUser TU;
@@ -71,9 +80,16 @@ else
     private List<Exception> exList = new List<Exception>();
     private List<Rectangle> responseList = new List<Rectangle>();
 
+    private void SetInputToken(string s) =>
+        inputToken = s;
+
+    private void SetTaskName(string s) =>
+        inputdatasetname = s;
+
+
     private async Task<TaskUser> GetDatasets()
     {
-        var atask = new TaskUser("https://api.logyhog.com/api/", "J9ZDPC", "blazortest", $"blazor{RandomString(6)}");
+        var atask = new TaskUser("https://api.logyhog.com/api/", inputToken, inputdatasetname, $"blazor{RandomString(6)}");
         atask.Setlimits(datasetname, 5, 5, 3, 3);
         await Task.Delay(1);
         return atask;
@@ -87,6 +103,18 @@ else
     private void IncrementCount()
     {
         currentCount++;
+    }
+
+    private async Task LoadTestTask()
+    {
+        try
+        {
+            TU = await GetDatasets();
+        }
+        catch (Exception e)
+        {
+            exList.Add(e);
+        }
     }
 
     protected override async Task OnInitializedAsync()
